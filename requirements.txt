@@ -1,0 +1,15 @@
+# Core (twin, generator, features, training, leakage audit, reports)
+numpy>=1.24
+scipy>=1.10
+scikit-learn>=1.3
+joblib>=1.3
+
+# Figures
+matplotlib>=3.7
+
+# Real-video bridge only (predict_on_video.py)
+mediapipe>=0.10.20
+opencv-python>=4.8
+
+# Asset probing only (probe_glb.py); optional
+trimesh>=4.0

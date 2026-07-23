@@ -1,0 +1,400 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+\usepackage{cite}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{stfloats}
+\usepackage{booktabs}
+\usepackage{url}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{TremorTwin: Training a Markerless Tremor-Frequency and Severity Estimator
+on a Rigged-Hand Digital Twin, with a Leakage-Controlled Evaluation}
+
+\author{\IEEEauthorblockN{Aharshi Bhattacharjee}
+\IEEEauthorblockA{\textit{North Carolina State University}\\
+Raleigh, NC, USA}}
+
+\maketitle
+
+\begin{abstract}
+Video-based tremor assessment is a promising modality for tele-neurology, but
+annotated patient video is scarce and clinician ratings are subject to
+inter-rater variability. This study investigates whether a model trained solely on
+synthetic data can recover the two clinically relevant tremor descriptors,
+oscillation frequency and severity, from hand landmarks alone. We present
+TremorTwin, a landmark-level digital twin derived from an anatomically rigged hand
+asset. Forward kinematics reproduce the asset's rest geometry to within
+$5\times10^{-6}$ of the model size. The wrist is driven by a parametric tremor,
+the moving joints are projected to image coordinates under a tracker-noise model,
+and a blind estimator is trained through an iterative feature and model search. We
+further identify a labelling pitfall that inflates reported accuracy: when
+frequency and amplitude are both derived from a single intensity scalar, the two
+prediction targets become collinear ($r=-0.97$), so an apparent joint prediction
+reduces to one measurement. After the two factors are sampled independently, a
+subject-held-out evaluation yields a frequency error below 1~Hz on 95.8\% of clips
+(mean absolute error 0.18~Hz) and a severity grade within one grade on all clips
+(exact-grade accuracy 86.5\%). A label-shuffle control returns to chance and no
+subject appears in two splits. Applied to two public datasets, the same spectral
+estimator recovers Parkinsonian rest-tremor frequency near 4--6~Hz and separates
+patients from controls, although the separation is strong only for essential
+tremor. The full landmark model has not been evaluated on real video, because the
+one public dataset suited to that test is presently offline. We therefore report a
+synthetic-training method, a leakage-controlled evaluation protocol, and a partial
+sim-to-real result, rather than a clinical validation.
+\end{abstract}
+
+\begin{IEEEkeywords}
+tremor, computer vision, hand landmarks, synthetic data, digital twin,
+sim-to-real, Parkinson's disease, essential tremor
+\end{IEEEkeywords}
+
+\section{Introduction}
+Tremor is among the most common movement disorders, and its two measurable
+properties, oscillation frequency and amplitude, carry diagnostic and
+treatment-monitoring value. In clinical practice, tremor is graded by visual
+inspection using ordinal scales such as TETRAS and the MDS-UPDRS, which are
+subjective and coarse. A camera-based system that tracks the hand and reports a
+frequency and a severity grade would enable assessment at home between clinical
+visits.
+
+Two obstacles impede a purely data-driven approach. First, video of real patients
+is difficult to obtain and to share, because faces are identifiable and the
+recordings are clinical. Second, ground-truth labels are either costly
+(synchronised accelerometry) or noisy (clinician grades). Synthetic data offers a
+route around both constraints: a rigged hand can be oscillated at a known
+frequency and amplitude and rendered as many times as required. To our knowledge,
+however, no prior study trains a tremor frequency or severity model primarily on
+synthetic hand data and then evaluates transfer to real patients. The most closely
+related work renders a synthetic hand solely to calibrate an off-the-shelf tracker
+and trains no model on it \cite{wolke2025}.
+
+This paper pursues the synthetic-training approach and reports the conditions under
+which it succeeds and fails. The contributions are as follows.
+\begin{enumerate}
+\item A landmark-level digital twin of a rigged hand that reproduces the source
+asset's geometry exactly and injects the same parametric tremor as the underlying
+rendering pipeline, so that a model can be trained without rendering any frames.
+\item A measurement pitfall and its correction. Deriving tremor frequency and
+amplitude from a single latent scalar renders the two targets collinear, so that a
+joint prediction reduces to one measurement. We quantify the collinearity and
+provide a generator that samples the two factors independently, in agreement with
+the physiology \cite{pan2025}.
+\item A leakage-controlled evaluation protocol, comprising subject-held-out
+splits, a label-shuffle null, a train-versus-test domain check, and permutation
+importance, applied to every experiment.
+\item A partial sim-to-real result. The spectral core of the model recovers real
+tremor frequency and separates patients from controls on two public datasets, with
+the explicit caveat that this evaluates the shared signal-processing core rather
+than the full landmark model.
+\end{enumerate}
+
+\section{Related Work}
+\emph{Video and pose-based tremor estimation.} Pintea et al.\ estimated hand-tremor
+frequency from video and released the TIM-Tremor benchmark, scoring a frequency as
+correct when it falls within 1~Hz of accelerometry \cite{pintea2018}. Subsequent
+work employed pose and hand-landmark trackers. G\"uney et al.\ report a frequency
+error of 0.229~Hz with MediaPipe on high-frame-rate video \cite{guney2022};
+Friedrich et al.\ validate a MediaPipe pipeline for frequency and amplitude against
+accelerometry in 66 patients \cite{friedrich2024}; Liu et al.\ predict MDS-UPDRS
+tremor scores from video \cite{liu2023}; Duque-Quiceno et al.\ score postural
+tremor with a pixel-based network \cite{duque2024}. Each of these systems is
+trained on real patient video.
+
+\emph{Synthetic data and sim-to-real transfer.} Domain randomisation trains on
+randomised synthetic renders so that the real world appears as one further
+variation \cite{tobin2017}. Synthetic hands support generic three-dimensional
+hand-pose estimation, but we found no application to a movement-disorder task.
+Wolke et al.\ render an oscillating hand in Blender, but use it only to
+characterise a frozen tracker rather than to train a model \cite{wolke2025}. One
+digital-twin study trains exclusively on simulated tremor, but predicts muscle
+activation from a wrist angle rather than frequency or severity, uses no camera,
+and does not evaluate on real data. Synthetic tremor for classification has been
+examined for accelerometer and EMG signals, in each case as augmentation of real
+data rather than as the primary training source.
+
+\emph{Position of this work.} The present study combines three properties that, to
+our knowledge, no prior tremor study combines: a computer-vision model, trained
+primarily on synthetic data, and evaluated for transfer to real patients. We
+additionally report the frequency-severity collinearity, which we did not find
+discussed in the tremor machine-learning literature.
+
+\section{Method}
+
+\subsection{Digital twin}
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figs/fig_twin.pdf}
+\caption{The TremorTwin digital twin. (a) The 21 rigged joints projected to two
+dimensions in the hand's widest anatomical plane, forming a recognisable hand.
+(b) Horizontal displacement of the index fingertip over a two-second clip, showing
+the injected wrist tremor at 6.7~Hz.}
+\label{fig:twin}
+\end{figure*}
+The source asset is a rigged hand with 21 joints, comprising a wrist and four bones
+per finger. The joint hierarchy and local transforms are parsed directly from the
+asset file, and joint positions are computed by forward kinematics. In the absence
+of any added rotation, the computed rest positions match the asset's own scene
+graph to within $5\times10^{-6}$ of the model size, which confirms the kinematics
+before any dependent component is built. An anisotropic scale on the root node must
+be applied for this correspondence to hold.
+
+Only the wrist oscillates; the fingers hold a fixed configuration for the duration
+of a clip. The posed hand is therefore a rigid body rotating about the wrist, which
+reproduces the behaviour of the rendering pipeline that the twin represents
+(Fig.~\ref{fig:twin}). At each frame the wrist rotation is set to
+\begin{equation}
+\theta(t) = A\left[\sin(2\pi f t) + 0.18\sin(4\pi f t + 0.5)\right] + \epsilon(t),
+\end{equation}
+where the second harmonic imparts a pathological waveform and $\epsilon(t)$ models
+inter-cycle muscle noise. The remaining two wrist axes carry phase-shifted copies
+of the same signal. All 21 joints are rotated about the wrist, projected to image
+coordinates under one of four camera views, and perturbed by a MediaPipe-style
+noise model comprising per-landmark jitter, whole-hand wobble, and occasional
+dropped frames held at their last value.
+
+\subsection{Two label models}
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figs/fig_collinearity.pdf}
+\caption{Why the two targets must be decoupled. Each point is one synthetic clip.
+(a) Under the pipeline's coupled labelling, amplitude is a deterministic function
+of frequency ($r=-1.00$), so frequency and severity form a single axis. (b) Under
+the decoupled generator, amplitude is sampled independently of the type-conditioned
+frequency ($r=-0.23$), giving two separable targets. The gap near 6--8~Hz and the
+low-amplitude cluster above 8~Hz reflect the tremor-type frequency bands.}
+\label{fig:coll}
+\end{figure*}
+Data are generated in two configurations. The \emph{coupled} generator reproduces
+the pipeline's own labelling, in which a single intensity scalar $i\in[1,100]$ sets
+the frequency $f=10-0.06i$, the amplitude $A=0.0015i$, and a six-band severity
+grade. Because both targets follow $i$, they are collinear (Fig.~\ref{fig:coll}a).
+The \emph{decoupled} generator samples a tremor type, which fixes a frequency band
+(Parkinsonian rest 4--6~Hz, essential or postural 5--9~Hz, enhanced physiologic
+8--12~Hz), and samples amplitude independently; severity then follows from
+amplitude, as clinical amplitude scales prescribe (Fig.~\ref{fig:coll}b). We
+additionally simulate 24 to 30 subjects, each with a distinct hand shape and noise
+level, so that splits may be constructed on a per-subject basis.
+
+\subsection{Blind features}
+The estimator observes only the sequence of 21 two-dimensional landmarks. For each
+landmark, the two coordinate signals are high-pass filtered to remove slow drift,
+after which a Welch power spectrum (dominant frequency by parabolic interpolation,
+band powers, and spectral entropy) and a set of time-domain descriptors
+(size-normalised displacement, jerk, zero-crossing rate, and autocorrelation
+period) are computed. One feature merits explicit description: dividing a
+landmark's displacement by its distance from the wrist yields the wrist rotation
+amplitude directly, independently of finger configuration, camera view, and hand
+size, and thus constitutes the physically appropriate severity signal. All
+amplitudes are normalised by an in-clip hand size, so that camera distance does not
+affect the descriptors.
+
+\subsection{Self-improving search}
+The estimator is optimised in successive rounds. Each round expands the feature set
+(temporal descriptors, then spectral descriptors, then cross-landmark agreement)
+and the model family (linear models, then random forests and gradient boosting,
+then a tuned selection), scores each candidate by subject-grouped cross-validation,
+and retains the best configuration. The procedure terminates when the score ceases
+to improve. The selected model is then evaluated once on held-out subjects that
+were not observed during the search.
+
+\subsection{Leakage controls}
+Every experiment applies four checks. Splits are grouped by subject, and we assert
+that no subject, pose, or camera view appears in two splits. We report the
+correlation between the two targets, which exposes the coupled generator. We
+retrain the selected model on shuffled labels and confirm that the score returns to
+chance. We train a classifier to distinguish training rows from test rows and
+report its AUC. Finally, we report permutation importance to confirm that the model
+relies on tremor-physics features rather than identity artifacts.
+
+\section{Experiments and Results}
+
+\subsection{Synthetic evaluation}
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figs/fig_freq.pdf}
+\caption{Predicted versus true tremor frequency on held-out subjects, using the
+exported model (3~s clips). Most clips fall within the $\pm$1~Hz band; the residual
+outliers are second-harmonic confusions and low-amplitude high-frequency clips. The
+4~s configuration in Table~\ref{tab:main} reaches 95.8\% within 1~Hz.}
+\label{fig:freq}
+\end{figure}
+Table~\ref{tab:main} reports subject-held-out results. The coupled generator
+attains high nominal accuracy, placing 99.7\% of clips within 1~Hz and grading
+96.9\% of clips correctly. However, the collinearity check reports $r=-0.97$
+between frequency and severity (Fig.~\ref{fig:coll}a), so these two figures reflect
+a single recovered quantity rather than two independent capabilities. This is the
+pitfall against which the present study cautions.
+
+Under the decoupled generator the two targets are independent ($r=0.27$), and the
+resulting figures are those we regard as defensible. With 4-second clips and the
+drift high-pass, the model places 95.8\% of clips within 1~Hz at a mean absolute
+error of 0.18~Hz (Fig.~\ref{fig:freq}), which lies within the range reported for
+real-patient MediaPipe pipelines \cite{guney2022,friedrich2024}. Severity is graded
+exactly on 86.5\% of clips and within one grade on all clips; within-one-grade
+accuracy is the appropriate criterion for an ordinal scale whose adjacent grades
+are closely spaced \cite{zhang2021}. A signal-processing baseline, defined as the
+per-axis spectral peak with no learning, already places 86.8\% of clips within
+1~Hz, so learning contributes approximately nine percentage points to frequency;
+the larger benefit of learning appears in severity, where amplitude must be read
+through pose-dependent lever arms.
+
+\begin{table}[t]
+\caption{Subject-held-out results. ``Coupled'' denotes the pipeline's own
+labelling and is included only to expose the collinearity. ``+HP'' denotes the
+drift high-pass filter.}
+\label{tab:main}
+\centering
+\setlength{\tabcolsep}{4pt}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lccccc}
+\toprule
+Setting & $r(f,\text{sev})$ & F$\le$1Hz & MAE & Sev & $\pm$1 \\
+\midrule
+Coupled, 2s      & $-0.97$ & 99.7\% & 0.14 & 96.9\% & 100\% \\
+Decoupled, 2s    & 0.32 & 84.3\% & 0.49 & 81.9\% & 100\% \\
+Decoupled, 4s    & 0.23 & 91.5\% & 0.27 & 90.5\% & 100\% \\
+Decoupled, 4s+HP & 0.27 & 95.8\% & 0.18 & 86.5\% & 100\% \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+The high-pass filter introduces a trade-off between metrics. It raises frequency
+accuracy from 91.5\% to 95.8\% and lowers the mean error to 0.18~Hz, but reduces
+exact-grade severity by approximately four percentage points, because it attenuates
+the amplitude of the slowest rest tremor near 4~Hz. Within-one-grade severity
+remains at 100\%. The filter was introduced because real signals require it, as the
+following subsection demonstrates.
+
+The leakage checks pass throughout. Shuffling the labels reduces decoupled accuracy
+to 0.31 against a chance rate of 0.35, and reduces the coupled case to 0.23 against
+0.29, indicating that the models learn the tremor signal rather than subject
+identity. No subject appears in two splits. The features on which the severity
+model relies are the angular-amplitude estimate and the spectral band powers, which
+is consistent with the intended design.
+
+\subsection{Real-tremor validation}
+\begin{figure*}[!b]
+\centering
+\includegraphics[width=\textwidth]{figs/fig_real.pdf}
+\caption{Transfer of the spectral core to real tremor. (a) On UCI-395, the raw peak
+sits near 2~Hz because postural drift dominates; after the same high-pass used in
+training, the recovered Parkinsonian rest-tremor frequency moves into the
+physiological 3.5--7.5~Hz band (shaded). (b) On PADS, recovered frequencies for
+healthy controls (HC), Parkinson's disease (PD), and essential tremor (ET) are
+physiological. A peak is returned even for controls, so frequency separates the
+groups only weakly; detection instead relies on tremor-band power, as reported in
+the text.}
+\label{fig:real}
+\end{figure*}
+The public video dataset best suited to evaluating the full landmark model,
+TIM-Tremor, is presently offline owing to a repository migration. We therefore
+evaluate the shared spectral core on two public datasets in adjacent modalities,
+and state explicitly that this does not evaluate the landmark model or the video
+path.
+
+\emph{UCI-395} records pen trajectories, including a task in which the patient
+holds the pen on a fixed point. The hold constitutes rest tremor as a
+two-dimensional position signal, which corresponds to the modality of a landmark.
+Applying the model's own spectral estimator, a naive peak returns a median of
+2.08~Hz, because slow postural drift dominates the raw signal. After the same
+high-pass filter used in training, the recovered frequency has a median of 4.01~Hz
+and falls within the 3.5--7.5~Hz band for 81\% of patients, consistent with
+Parkinsonian rest tremor (Fig.~\ref{fig:real}a). The estimator separates patients
+from controls with an AUC of 0.94 on peak prominence, although the control group is
+small ($n=7$).
+
+\emph{PADS} records wrist accelerometry from 469 individuals, including 79 healthy
+controls, 276 with Parkinson's disease, and 28 with essential tremor. On the rest
+and postural tasks the recovered frequencies lie near 5.7~Hz for both diseases,
+which is physiological (Fig.~\ref{fig:real}b). The features separate essential
+tremor from controls with an AUC of 0.90, which is strong; essential tremor is
+defined by its postural component, so the majority of patients present a clear
+signal. The features separate Parkinsonian rest tremor from controls with an AUC of
+0.69. This lower value is expected rather than anomalous, and reflects a known
+clinical phenomenon: a substantial proportion of Parkinson's patients are not
+tremor-dominant and exhibit little rest tremor, which dilutes the group. Frequency
+alone does not separate the two diseases (medians 5.7 versus 6.4~Hz, $p=0.07$),
+which is likewise consistent with clinical experience.
+
+Taken together, the two datasets indicate that the spectral core transfers to real
+tremor. It recovers the correct frequency once drift is removed, and it detects
+tremor strongly where tremor is the defining feature and weakly where many patients
+lack it.
+
+\section{Discussion and Limitations}
+The present contribution is a method and an evaluation protocol rather than a
+clinical tool, and the limitations are stated below without qualification.
+
+The full 21-landmark model has not been evaluated on real hand video. UCI-395
+provides a single landmark and PADS provides accelerometer channels, so both
+evaluate the spectral core that the model shares, rather than the model itself.
+Closing this gap requires real hand video with a frequency reference, which is
+precisely what TIM-Tremor provided and what is currently unavailable.
+
+The twin oscillates the wrist with the fingers held stationary. Real tremor
+includes finger and pill-rolling components, so a wrist-only twin under-represents
+the phenomenon. The tracker-noise model is parametric and does not reproduce real
+failure modes such as self-occlusion and motion blur.
+
+Severity estimation on real data remains largely untested. UCI-395 provides only a
+patient-versus-control label with a small control group, and camera-based amplitude
+is known to be less reliable than camera-based frequency \cite{wolke2025}. The
+synthetic severity figures should therefore be interpreted as an upper bound under
+ideal tracking.
+
+Two of the works against which we position this study were behind paywalls, so
+those statements rest on abstracts and should be verified before a camera-ready
+version.
+
+\section{Conclusion}
+We trained a hand-tremor frequency and severity estimator on a rigged digital twin
+and evaluated it under a leakage-controlled protocol. On decoupled,
+subject-held-out synthetic data the model attains a frequency error of 0.18~Hz and
+grades severity within one grade on all clips, with the leakage controls passing
+throughout. The same spectral core recovers real Parkinsonian rest-tremor frequency
+near 4~Hz and separates essential-tremor patients from controls at an AUC of 0.90
+on two public datasets. In the course of this work we identified and corrected a
+labelling pitfall that would otherwise have reduced a joint frequency-and-severity
+claim to a single measurement. The remaining step is a real-video evaluation of the
+full landmark model, for which the software is in place and only suitable data is
+lacking.
+
+\begin{thebibliography}{00}
+\bibitem{pintea2018} S.~L. Pintea, J. Zheng, X. Li, P.~J.~M. Bank, J.~J. van
+Hilten, and J.~C. van Gemert, ``Hand-tremor frequency estimation in videos,'' in
+\emph{Proc. ECCV Workshops}, 2018, arXiv:1809.03218.
+\bibitem{guney2022} G.~G\"uney \emph{et al.}, ``Video-based hand movement analysis
+of Parkinson patients using high-frame-rate videos and MediaPipe,'' \emph{Sensors},
+vol.~22, no.~20, p.~7992, 2022.
+\bibitem{friedrich2024} M.~U. Friedrich \emph{et al.}, ``Validation and application
+of computer vision algorithms for video-based tremor analysis,'' \emph{npj Digital
+Medicine}, vol.~7, p.~165, 2024.
+\bibitem{liu2023} W.~Liu \emph{et al.}, ``Vision-based estimation of MDS-UPDRS
+scores for quantifying Parkinson's disease tremor severity,'' \emph{Medical Image
+Analysis}, vol.~85, p.~102754, 2023.
+\bibitem{duque2024} F.~Duque-Quiceno, G. Sarapata, Y. Dushin, M. Allen, and J.
+O'Keeffe, ``Deep learning for objective estimation of Parkinsonian tremor
+severity,'' arXiv:2409.02011, 2024.
+\bibitem{zhang2021} L.~Zhang, V. Yadav, V. Koesmahargyo, A. Abbas, and I.
+Galatzer-Levy, ``Prediction of clinical tremor severity using rank consistent
+ordinal regression,'' arXiv:2105.01133, 2021.
+\bibitem{wolke2025} R.~Wolke, J. Welzel, W. Maetzler, G. Deuschl, and J. Becktepe,
+``Validity of tremor analysis using smartphone compatible computer vision
+frameworks,'' \emph{Scientific Reports}, vol.~15, no.~1, p.~13391, 2025.
+\bibitem{tobin2017} J.~Tobin, R. Fong, A. Ray, J. Schneider, W. Zaremba, and P.
+Abbeel, ``Domain randomization for transferring deep neural networks from
+simulation to the real world,'' in \emph{Proc. IEEE/RSJ IROS}, 2017, pp.~23--30.
+\bibitem{pan2025} M.-K. Pan, ``Targeting the fundamentals for tremors: the
+frequency and amplitude coding in essential tremor,'' \emph{Journal of Biomedical
+Science}, vol.~32, p.~18, 2025.
+\bibitem{pads2023} J.~Varghese \emph{et al.}, ``Predicting Parkinson's disease
+using smartwatch sensor data (PADS),'' PhysioNet, 2023.
+\bibitem{uci395} M.~E. Isenkul, B.~E. Sakar, and O. Kursun, ``Improved spiral test
+using digitized graphics tablet for monitoring Parkinson's disease,'' UCI Machine
+Learning Repository, dataset~395.
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,655 @@
+{
+  "mode": "decoupled",
+  "n_rows": 1440,
+  "n_features": 77,
+  "config": {
+    "poses": 360,
+    "frames": 120,
+    "fps": 60,
+    "subjects": 24,
+    "seed": 42,
+    "test_frac": 0.22,
+    "p_no_tremor": 0.12
+  },
+  "label_collinearity": {
+    "pearson_freq_severity": 0.3199229506157484,
+    "spearman_freq_severity": 0.25707661324865616,
+    "pearson_freq_amp": 0.14426581240661368,
+    "verdict": "OK: targets are not collinear -> two independent problems"
+  },
+  "severity": {
+    "group_disjoint": {
+      "disjoint": true,
+      "overlap_count": 0,
+      "group_counts": [
+        18,
+        6
+      ]
+    },
+    "best": {
+      "score": 0.7810416666666666,
+      "config": [
+        "histgb",
+        {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 0.0,
+          "depth": null
+        }
+      ],
+      "fset": [
+        "temporal",
+        "spectral",
+        "agreement"
+      ]
+    },
+    "history": [
+      {
+        "round": 0,
+        "features": [
+          "temporal"
+        ],
+        "model": "logreg",
+        "hparams": {
+          "C": 1.0
+        },
+        "cv_score": 0.7277
+      },
+      {
+        "round": 0,
+        "features": [
+          "temporal"
+        ],
+        "model": "rf",
+        "hparams": {
+          "n": 200
+        },
+        "cv_score": 0.7627
+      },
+      {
+        "round": 1,
+        "features": [
+          "temporal",
+          "spectral"
+        ],
+        "model": "rf",
+        "hparams": {
+          "n": 300
+        },
+        "cv_score": 0.7648
+      },
+      {
+        "round": 1,
+        "features": [
+          "temporal",
+          "spectral"
+        ],
+        "model": "extra",
+        "hparams": {
+          "n": 400
+        },
+        "cv_score": 0.7537
+      },
+      {
+        "round": 1,
+        "features": [
+          "temporal",
+          "spectral"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 300,
+          "lr": 0.08
+        },
+        "cv_score": 0.7781
+      },
+      {
+        "round": 2,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 400,
+          "lr": 0.06,
+          "l2": 0.0
+        },
+        "cv_score": 0.7758
+      },
+      {
+        "round": 2,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "extra",
+        "hparams": {
+          "n": 600,
+          "leaf": 1
+        },
+        "cv_score": 0.7521
+      },
+      {
+        "round": 2,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "rf",
+        "hparams": {
+          "n": 500,
+          "leaf": 1
+        },
+        "cv_score": 0.7706
+      },
+      {
+        "round": 3,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 0.0,
+          "depth": null
+        },
+        "cv_score": 0.781
+      },
+      {
+        "round": 3,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 0.0,
+          "depth": 6
+        },
+        "cv_score": 0.7744
+      },
+      {
+        "round": 3,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 1.0,
+          "depth": null
+        },
+        "cv_score": 0.771
+      },
+      {
+        "round": 3,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 1.0,
+          "depth": 6
+        },
+        "cv_score": 0.7746
+      },
+      {
+        "round": 4,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 0.0,
+          "depth": null
+        },
+        "cv_score": 0.781
+      },
+      {
+        "round": 4,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 0.0,
+          "depth": 6
+        },
+        "cv_score": 0.7744
+      },
+      {
+        "round": 4,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 1.0,
+          "depth": null
+        },
+        "cv_score": 0.771
+      },
+      {
+        "round": 4,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 1.0,
+          "depth": 6
+        },
+        "cv_score": 0.7746
+      },
+      {
+        "round": 5,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 0.0,
+          "depth": null
+        },
+        "cv_score": 0.781
+      },
+      {
+        "round": 5,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 0.0,
+          "depth": 6
+        },
+        "cv_score": 0.7744
+      },
+      {
+        "round": 5,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 1.0,
+          "depth": null
+        },
+        "cv_score": 0.771
+      },
+      {
+        "round": 5,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 1.0,
+          "depth": 6
+        },
+        "cv_score": 0.7746
+      }
+    ],
+    "test_metrics": {
+      "accuracy": 0.8194444444444444,
+      "adjacent_acc": 1.0,
+      "macro_f1": 0.7129571802798423
+    },
+    "test_class_support": {
+      "Absent": 36,
+      "Slight": 140,
+      "Mild": 124,
+      "Moderate": 48,
+      "Marked": 8,
+      "Severe": 4
+    },
+    "leakage": {
+      "label_shuffle_null": {
+        "metric": "accuracy",
+        "shuffled_score": 0.34875,
+        "majority_chance": 0.362962962962963,
+        "verdict": "OK: shuffled labels collapse toward chance"
+      },
+      "train_test_separability": {
+        "domain_auc": 0.67561971909798,
+        "verdict": "NOTE: train/test distributions differ (expected if subject-independent split shifts the distribution)"
+      },
+      "top_features": [
+        {
+          "feature": "disp_rms__std",
+          "importance": 0.3472222222222222
+        },
+        {
+          "feature": "peakx__std",
+          "importance": 0.007291666666666641
+        },
+        {
+          "feature": "ang_amp_median",
+          "importance": 0.005902777777777757
+        },
+        {
+          "feature": "peaky__max",
+          "importance": 0.005208333333333315
+        },
+        {
+          "feature": "total__max",
+          "importance": 0.004513888888888873
+        },
+        {
+          "feature": "peaky__std",
+          "importance": 0.003819444444444431
+        },
+        {
+          "feature": "tip_total__max",
+          "importance": 0.00347222222222221
+        },
+        {
+          "feature": "tip_ang_amp__max",
+          "importance": 0.003124999999999989
+        },
+        {
+          "feature": "peak_agree",
+          "importance": 0.002083333333333326
+        },
+        {
+          "feature": "tip_disp_rms__mean",
+          "importance": 0.001388888888888884
+        }
+      ]
+    }
+  },
+  "frequency": {
+    "best": {
+      "score": 0.86366935824483,
+      "config": [
+        "extra",
+        {
+          "n": 600,
+          "leaf": 1
+        }
+      ],
+      "fset": [
+        "temporal",
+        "spectral",
+        "agreement"
+      ]
+    },
+    "history": [
+      {
+        "round": 0,
+        "features": [
+          "temporal"
+        ],
+        "model": "ridge",
+        "hparams": {
+          "alpha": 1.0
+        },
+        "cv_score": 0.4523
+      },
+      {
+        "round": 0,
+        "features": [
+          "temporal"
+        ],
+        "model": "rf",
+        "hparams": {
+          "n": 200
+        },
+        "cv_score": 0.5749
+      },
+      {
+        "round": 1,
+        "features": [
+          "temporal",
+          "spectral"
+        ],
+        "model": "rf",
+        "hparams": {
+          "n": 300
+        },
+        "cv_score": 0.8595
+      },
+      {
+        "round": 1,
+        "features": [
+          "temporal",
+          "spectral"
+        ],
+        "model": "extra",
+        "hparams": {
+          "n": 400
+        },
+        "cv_score": 0.8619
+      },
+      {
+        "round": 1,
+        "features": [
+          "temporal",
+          "spectral"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 300,
+          "lr": 0.08
+        },
+        "cv_score": 0.8513
+      },
+      {
+        "round": 2,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 400,
+          "lr": 0.06,
+          "l2": 0.0
+        },
+        "cv_score": 0.8483
+      },
+      {
+        "round": 2,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "extra",
+        "hparams": {
+          "n": 600,
+          "leaf": 1
+        },
+        "cv_score": 0.8637
+      },
+      {
+        "round": 2,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "rf",
+        "hparams": {
+          "n": 500,
+          "leaf": 1
+        },
+        "cv_score": 0.8575
+      },
+      {
+        "round": 3,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "extra",
+        "hparams": {
+          "n": 600,
+          "leaf": 1
+        },
+        "cv_score": 0.8637
+      },
+      {
+        "round": 3,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "extra",
+        "hparams": {
+          "n": 600,
+          "leaf": 2
+        },
+        "cv_score": 0.8602
+      },
+      {
+        "round": 3,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "extra",
+        "hparams": {
+          "n": 900,
+          "leaf": 1
+        },
+        "cv_score": 0.8627
+      },
+      {
+        "round": 3,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "extra",
+        "hparams": {
+          "n": 900,
+          "leaf": 2
+        },
+        "cv_score": 0.8603
+      },
+      {
+        "round": 4,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "extra",
+        "hparams": {
+          "n": 600,
+          "leaf": 1
+        },
+        "cv_score": 0.8637
+      },
+      {
+        "round": 4,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "extra",
+        "hparams": {
+          "n": 600,
+          "leaf": 2
+        },
+        "cv_score": 0.8602
+      },
+      {
+        "round": 4,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "extra",
+        "hparams": {
+          "n": 900,
+          "leaf": 1
+        },
+        "cv_score": 0.8627
+      },
+      {
+        "round": 4,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "extra",
+        "hparams": {
+          "n": 900,
+          "leaf": 2
+        },
+        "cv_score": 0.8603
+      }
+    ],
+    "test_metrics": {
+      "mae_hz": 0.4948176566227656,
+      "within_1hz": 0.8425925925925926,
+      "within_0p5hz": 0.7438271604938271,
+      "r2": 0.8203717512555733
+    },
+    "naive_fft_baseline": {
+      "mae_hz": 0.48554560294882365,
+      "within_1hz": 0.8179012345679012,
+      "within_0p5hz": 0.7376543209876543,
+      "r2": 0.8147556098191147
+    }
+  }
+}

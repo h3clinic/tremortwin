@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Large or licence-restricted assets that are NOT redistributed.
+# See docs/DATA.md for how to obtain each of these.
+realdata/*.zip          # PADS (CC BY-NC-SA), UCI-395
+realdata/pads/
+realdata/uci395/
+results/models/*.joblib # trained models (~180 MB); rebuild with train_export.py
+hand_landmarker.task    # Google MediaPipe model; download URL in docs/DATA.md
+*.glb                   # rigged-hand asset belongs to the upstream handharness project
+*.fbx
+
+# Large intermediate outputs
+datasets/
+output/
+*.mp4
+
+# LaTeX build artifacts (keep paper/figs/*.pdf)
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.bbl
+paper/*.blg
+paper/*.synctex.gz
+paper/*.fls
+paper/*.fdb_latexmk
+paper/*.pdf
+!paper/figs/*.pdf
+
+# OS
+.DS_Store
+Thumbs.db

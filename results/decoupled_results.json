@@ -1,0 +1,498 @@
+{
+  "mode": "decoupled",
+  "n_rows": 2400,
+  "n_features": 77,
+  "config": {
+    "poses": 600,
+    "frames": 240,
+    "fps": 60,
+    "subjects": 24,
+    "seed": 42,
+    "test_frac": 0.22,
+    "p_no_tremor": 0.12
+  },
+  "label_collinearity": {
+    "pearson_freq_severity": 0.2658257948072767,
+    "spearman_freq_severity": 0.16994584151534167,
+    "pearson_freq_amp": 0.11662355697025273,
+    "verdict": "OK: targets are not collinear -> two independent problems"
+  },
+  "severity": {
+    "group_disjoint": {
+      "disjoint": true,
+      "overlap_count": 0,
+      "group_counts": [
+        18,
+        6
+      ]
+    },
+    "best": {
+      "score": 0.859125,
+      "config": [
+        "histgb",
+        {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 1.0,
+          "depth": null
+        }
+      ],
+      "fset": [
+        "temporal",
+        "spectral",
+        "agreement"
+      ]
+    },
+    "history": [
+      {
+        "round": 0,
+        "features": [
+          "temporal"
+        ],
+        "model": "logreg",
+        "hparams": {
+          "C": 1.0
+        },
+        "cv_score": 0.7752
+      },
+      {
+        "round": 0,
+        "features": [
+          "temporal"
+        ],
+        "model": "rf",
+        "hparams": {
+          "n": 200
+        },
+        "cv_score": 0.7824
+      },
+      {
+        "round": 1,
+        "features": [
+          "temporal",
+          "spectral"
+        ],
+        "model": "rf",
+        "hparams": {
+          "n": 300
+        },
+        "cv_score": 0.8325
+      },
+      {
+        "round": 1,
+        "features": [
+          "temporal",
+          "spectral"
+        ],
+        "model": "extra",
+        "hparams": {
+          "n": 400
+        },
+        "cv_score": 0.8217
+      },
+      {
+        "round": 1,
+        "features": [
+          "temporal",
+          "spectral"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 300,
+          "lr": 0.08
+        },
+        "cv_score": 0.8549
+      },
+      {
+        "round": 2,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 400,
+          "lr": 0.06,
+          "l2": 0.0
+        },
+        "cv_score": 0.8454
+      },
+      {
+        "round": 2,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "extra",
+        "hparams": {
+          "n": 600,
+          "leaf": 1
+        },
+        "cv_score": 0.8279
+      },
+      {
+        "round": 2,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "rf",
+        "hparams": {
+          "n": 500,
+          "leaf": 1
+        },
+        "cv_score": 0.8284
+      },
+      {
+        "round": 3,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 0.0,
+          "depth": null
+        },
+        "cv_score": 0.8481
+      },
+      {
+        "round": 3,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 0.0,
+          "depth": 6
+        },
+        "cv_score": 0.8545
+      },
+      {
+        "round": 3,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 1.0,
+          "depth": null
+        },
+        "cv_score": 0.8591
+      },
+      {
+        "round": 3,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 1.0,
+          "depth": 6
+        },
+        "cv_score": 0.8576
+      },
+      {
+        "round": 4,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 0.0,
+          "depth": null
+        },
+        "cv_score": 0.8481
+      },
+      {
+        "round": 4,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 0.0,
+          "depth": 6
+        },
+        "cv_score": 0.8545
+      },
+      {
+        "round": 4,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 1.0,
+          "depth": null
+        },
+        "cv_score": 0.8591
+      },
+      {
+        "round": 4,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 1.0,
+          "depth": 6
+        },
+        "cv_score": 0.8576
+      },
+      {
+        "round": 5,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 0.0,
+          "depth": null
+        },
+        "cv_score": 0.8481
+      },
+      {
+        "round": 5,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 0.0,
+          "depth": 6
+        },
+        "cv_score": 0.8545
+      },
+      {
+        "round": 5,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 1.0,
+          "depth": null
+        },
+        "cv_score": 0.8591
+      },
+      {
+        "round": 5,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 1.0,
+          "depth": 6
+        },
+        "cv_score": 0.8576
+      }
+    ],
+    "test_metrics": {
+      "accuracy": 0.865,
+      "adjacent_acc": 1.0,
+      "macro_f1": 0.8054842695558024
+    },
+    "test_class_support": {
+      "Absent": 56,
+      "Slight": 196,
+      "Mild": 228,
+      "Moderate": 76,
+      "Marked": 32,
+      "Severe": 12
+    },
+    "leakage": {
+      "label_shuffle_null": {
+        "metric": "accuracy",
+        "shuffled_score": 0.31325000000000003,
+        "majority_chance": 0.3488888888888889,
+        "verdict": "OK: shuffled labels collapse toward chance"
+      },
+      "train_test_separability": {
+        "domain_auc": 0.6860476823325682,
+        "verdict": "NOTE: train/test distributions differ (expected if subject-independent split shifts the distribution)"
+      },
+      "top_features": [
+        {
+          "feature": "disp_rms__std",
+          "importance": 0.32291666666666663
+        },
+        {
+          "feature": "peaky__std",
+          "importance": 0.04333333333333332
+        },
+        {
+          "feature": "peak_axis_median",
+          "importance": 0.03624999999999998
+        },
+        {
+          "feature": "peakx__std",
+          "importance": 0.03458333333333331
+        },
+        {
+          "feature": "disp_rms__mean",
+          "importance": 0.018333333333333313
+        },
+        {
+          "feature": "acf_freq__std",
+          "importance": 0.014166666666666647
+        },
+        {
+          "feature": "tip_ang_amp__max",
+          "importance": 0.013333333333333308
+        },
+        {
+          "feature": "peaky__mean",
+          "importance": 0.012499999999999997
+        },
+        {
+          "feature": "peakx__mean",
+          "importance": 0.012291666666666659
+        },
+        {
+          "feature": "tip_ang_amp__mean",
+          "importance": 0.012291666666666659
+        }
+      ]
+    }
+  },
+  "frequency": {
+    "best": {
+      "score": 0.9688240902999692,
+      "config": [
+        "extra",
+        {
+          "n": 400
+        }
+      ],
+      "fset": [
+        "temporal",
+        "spectral"
+      ]
+    },
+    "history": [
+      {
+        "round": 0,
+        "features": [
+          "temporal"
+        ],
+        "model": "ridge",
+        "hparams": {
+          "alpha": 1.0
+        },
+        "cv_score": 0.4958
+      },
+      {
+        "round": 0,
+        "features": [
+          "temporal"
+        ],
+        "model": "rf",
+        "hparams": {
+          "n": 200
+        },
+        "cv_score": 0.6333
+      },
+      {
+        "round": 1,
+        "features": [
+          "temporal",
+          "spectral"
+        ],
+        "model": "rf",
+        "hparams": {
+          "n": 300
+        },
+        "cv_score": 0.9615
+      },
+      {
+        "round": 1,
+        "features": [
+          "temporal",
+          "spectral"
+        ],
+        "model": "extra",
+        "hparams": {
+          "n": 400
+        },
+        "cv_score": 0.9688
+      },
+      {
+        "round": 1,
+        "features": [
+          "temporal",
+          "spectral"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 300,
+          "lr": 0.08
+        },
+        "cv_score": 0.9659
+      }
+    ],
+    "test_metrics": {
+      "mae_hz": 0.18221325621413326,
+      "within_1hz": 0.9577205882352942,
+      "within_0p5hz": 0.8878676470588235,
+      "r2": 0.9679906184977387
+    },
+    "naive_fft_baseline": {
+      "mae_hz": 0.3776336618801912,
+      "within_1hz": 0.8676470588235294,
+      "within_0p5hz": 0.8143382352941176,
+      "r2": 0.8300851999105994
+    }
+  }
+}

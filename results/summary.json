@@ -1,0 +1,10 @@
+{
+  "decoupled": {
+    "severity_exact": 0.865,
+    "severity_adjacent": 1.0,
+    "freq_within1hz": 0.9577205882352942,
+    "freq_mae": 0.18221325621413326,
+    "freq_naive_within1hz": 0.8676470588235294,
+    "targets_collinear": false
+  }
+}

@@ -1,0 +1,223 @@
+=== [1/4] leakage audit + 2s metrics (both modes) ===
+
+=== MODE: coupled ===
+    extracted 200 clips (15s)
+    extracted 400 clips (31s)
+    extracted 600 clips (46s)
+    extracted 800 clips (61s)
+    extracted 1000 clips (77s)
+    extracted 1200 clips (92s)
+    extracted 1400 clips (107s)
+    feature matrix: (1440, 77), 110s total
+  label collinearity r(freq,severity) = -0.972 -> DEGENERATE: targets collinear (|r|>0.9) -> predicting one trivially gives the other
+
+  [SEVERITY CLASSIFICATION] subject-held-out
+  [round 0] logreg  {'C': 1.0}                             feat=temporal                     cv_accuracy=0.9029
+  [round 0] rf      {'n': 200}                             feat=temporal                     cv_accuracy=0.8827
+  -> new best: logreg cv_accuracy=0.9029
+  [round 1] rf      {'n': 300}                             feat=temporal+spectral            cv_accuracy=0.9548
+  [round 1] extra   {'n': 400}                             feat=temporal+spectral            cv_accuracy=0.9460
+  [round 1] histgb  {'n': 300, 'lr': 0.08}                 feat=temporal+spectral            cv_accuracy=0.9663
+  -> new best: histgb cv_accuracy=0.9663
+  TARGET REACHED: cv_accuracy=0.9663 >= 0.95
+    TEST: exact_acc=0.969  adjacent_acc=1.000  macro_f1=0.963
+    shuffle-null acc=0.229 (chance~0.285) -> OK: shuffled labels collapse toward chance
+
+  [FREQUENCY REGRESSION] subject-held-out, tremor-present only
+  [round 0] ridge   {'alpha': 1.0}                         feat=temporal                     cv_within_1hz=0.9929
+  [round 0] rf      {'n': 200}                             feat=temporal                     cv_within_1hz=0.9990
+  -> new best: rf cv_within_1hz=0.9990
+  TARGET REACHED: cv_within_1hz=0.9990 >= 0.95
+    TEST ML : MAE=0.144Hz  within1Hz=0.997  within0.5Hz=0.989
+    TEST FFT-only baseline (no ML): MAE=0.059Hz  within1Hz=0.986
+    -> ML uplift over plain FFT peak: +0.011 within-1Hz
+  saved -> results/coupled_results.json
+
+=== MODE: decoupled ===
+    extracted 200 clips (15s)
+    extracted 400 clips (31s)
+    extracted 600 clips (46s)
+    extracted 800 clips (61s)
+    extracted 1000 clips (77s)
+    extracted 1200 clips (92s)
+    extracted 1400 clips (108s)
+    feature matrix: (1440, 77), 111s total
+  label collinearity r(freq,severity) = 0.320 -> OK: targets are not collinear -> two independent problems
+
+  [SEVERITY CLASSIFICATION] subject-held-out
+  [round 0] logreg  {'C': 1.0}                             feat=temporal                     cv_accuracy=0.7515
+  [round 0] rf      {'n': 200}                             feat=temporal                     cv_accuracy=0.7579
+  -> new best: rf cv_accuracy=0.7579
+  [round 1] rf      {'n': 300}                             feat=temporal+spectral            cv_accuracy=0.7675
+  [round 1] extra   {'n': 400}                             feat=temporal+spectral            cv_accuracy=0.7594
+  [round 1] histgb  {'n': 300, 'lr': 0.08}                 feat=temporal+spectral            cv_accuracy=0.7660
+  -> new best: rf cv_accuracy=0.7675
+  [round 2] histgb  {'n': 400, 'lr': 0.06, 'l2': 0.0}      feat=temporal+spectral+agreement  cv_accuracy=0.7646
+  [round 2] extra   {'n': 600, 'leaf': 1}                  feat=temporal+spectral+agreement  cv_accuracy=0.7606
+  [round 2] rf      {'n': 500, 'leaf': 1}                  feat=temporal+spectral+agreement  cv_accuracy=0.7660
+  [round 3] rf      {'n': 500, 'leaf': 1}                  feat=temporal+spectral+agreement  cv_accuracy=0.7660
+  [round 3] rf      {'n': 500, 'leaf': 2}                  feat=temporal+spectral+agreement  cv_accuracy=0.7692
+  [round 3] rf      {'n': 800, 'leaf': 1}                  feat=temporal+spectral+agreement  cv_accuracy=0.7700
+  [round 3] rf      {'n': 800, 'leaf': 2}                  feat=temporal+spectral+agreement  cv_accuracy=0.7727
+  -> new best: rf cv_accuracy=0.7727
+  [round 4] rf      {'n': 500, 'leaf': 1}                  feat=temporal+spectral+agreement  cv_accuracy=0.7660
+  [round 4] rf      {'n': 500, 'leaf': 2}                  feat=temporal+spectral+agreement  cv_accuracy=0.7692
+  [round 4] rf      {'n': 800, 'leaf': 1}                  feat=temporal+spectral+agreement  cv_accuracy=0.7700
+  [round 4] rf      {'n': 800, 'leaf': 2}                  feat=temporal+spectral+agreement  cv_accuracy=0.7727
+  [round 5] rf      {'n': 500, 'leaf': 1}                  feat=temporal+spectral+agreement  cv_accuracy=0.7660
+  [round 5] rf      {'n': 500, 'leaf': 2}                  feat=temporal+spectral+agreement  cv_accuracy=0.7692
+  [round 5] rf      {'n': 800, 'leaf': 1}                  feat=temporal+spectral+agreement  cv_accuracy=0.7700
+  [round 5] rf      {'n': 800, 'leaf': 2}                  feat=temporal+spectral+agreement  cv_accuracy=0.7727
+  saturated (no improvement for 2 rounds); stopping
+    TEST: exact_acc=0.817  adjacent_acc=1.000  macro_f1=0.682
+    shuffle-null acc=0.363 (chance~0.363) -> OK: shuffled labels collapse toward chance
+
+  [FREQUENCY REGRESSION] subject-held-out, tremor-present only
+  [round 0] ridge   {'alpha': 1.0}                         feat=temporal                     cv_within_1hz=0.4474
+  [round 0] rf      {'n': 200}                             feat=temporal                     cv_within_1hz=0.5667
+  -> new best: rf cv_within_1hz=0.5667
+  [round 1] rf      {'n': 300}                             feat=temporal+spectral            cv_within_1hz=0.8823
+  [round 1] extra   {'n': 400}                             feat=temporal+spectral            cv_within_1hz=0.9027
+  [round 1] histgb  {'n': 300, 'lr': 0.08}                 feat=temporal+spectral            cv_within_1hz=0.8969
+  -> new best: extra cv_within_1hz=0.9027
+  [round 2] histgb  {'n': 400, 'lr': 0.06, 'l2': 0.0}      feat=temporal+spectral+agreement  cv_within_1hz=0.8991
+  [round 2] extra   {'n': 600, 'leaf': 1}                  feat=temporal+spectral+agreement  cv_within_1hz=0.9017
+  [round 2] rf      {'n': 500, 'leaf': 1}                  feat=temporal+spectral+agreement  cv_within_1hz=0.8821
+  [round 3] extra   {'n': 600, 'leaf': 1}                  feat=temporal+spectral+agreement  cv_within_1hz=0.9017
+  [round 3] extra   {'n': 600, 'leaf': 2}                  feat=temporal+spectral+agreement  cv_within_1hz=0.9027
+  [round 3] extra   {'n': 900, 'leaf': 1}                  feat=temporal+spectral+agreement  cv_within_1hz=0.9017
+  [round 3] extra   {'n': 900, 'leaf': 2}                  feat=temporal+spectral+agreement  cv_within_1hz=0.9027
+  saturated (no improvement for 2 rounds); stopping
+    TEST ML : MAE=0.388Hz  within1Hz=0.904  within0.5Hz=0.809
+    TEST FFT-only baseline (no ML): MAE=0.616Hz  within1Hz=0.759
+    -> ML uplift over plain FFT peak: +0.145 within-1Hz
+  saved -> results/decoupled_results.json
+
+================ SUMMARY ================
+{
+  "coupled": {
+    "severity_exact": 0.9694444444444444,
+    "severity_adjacent": 1.0,
+    "freq_within1hz": 0.9972222222222222,
+    "freq_mae": 0.14396749999999933,
+    "freq_naive_within1hz": 0.9861111111111112,
+    "targets_collinear": true
+  },
+  "decoupled": {
+    "severity_exact": 0.8166666666666667,
+    "severity_adjacent": 1.0,
+    "freq_within1hz": 0.904320987654321,
+    "freq_mae": 0.38802216687466073,
+    "freq_naive_within1hz": 0.7592592592592593,
+    "targets_collinear": false
+  }
+}
+=== [2/4] 4s decoupled headline ===
+
+=== MODE: decoupled ===
+    extracted 200 clips (24s)
+    extracted 400 clips (48s)
+    extracted 600 clips (72s)
+    extracted 800 clips (96s)
+    extracted 1000 clips (120s)
+    extracted 1200 clips (144s)
+    extracted 1400 clips (168s)
+    extracted 1600 clips (192s)
+    extracted 1800 clips (216s)
+    extracted 2000 clips (240s)
+    extracted 2200 clips (264s)
+    extracted 2400 clips (289s)
+    feature matrix: (2400, 77), 289s total
+  label collinearity r(freq,severity) = 0.266 -> OK: targets are not collinear -> two independent problems
+
+  [SEVERITY CLASSIFICATION] subject-held-out
+  [round 0] logreg  {'C': 1.0}                             feat=temporal                     cv_accuracy=0.7752
+  [round 0] rf      {'n': 200}                             feat=temporal                     cv_accuracy=0.7824
+  -> new best: rf cv_accuracy=0.7824
+  [round 1] rf      {'n': 300}                             feat=temporal+spectral            cv_accuracy=0.8325
+  [round 1] extra   {'n': 400}                             feat=temporal+spectral            cv_accuracy=0.8217
+  [round 1] histgb  {'n': 300, 'lr': 0.08}                 feat=temporal+spectral            cv_accuracy=0.8549
+  -> new best: histgb cv_accuracy=0.8549
+  [round 2] histgb  {'n': 400, 'lr': 0.06, 'l2': 0.0}      feat=temporal+spectral+agreement  cv_accuracy=0.8454
+  [round 2] extra   {'n': 600, 'leaf': 1}                  feat=temporal+spectral+agreement  cv_accuracy=0.8279
+  [round 2] rf      {'n': 500, 'leaf': 1}                  feat=temporal+spectral+agreement  cv_accuracy=0.8284
+  [round 3] histgb  {'n': 500, 'lr': 0.05, 'l2': 0.0, 'depth': None} feat=temporal+spectral+agreement  cv_accuracy=0.8481
+  [round 3] histgb  {'n': 500, 'lr': 0.05, 'l2': 0.0, 'depth': 6} feat=temporal+spectral+agreement  cv_accuracy=0.8545
+  [round 3] histgb  {'n': 500, 'lr': 0.05, 'l2': 1.0, 'depth': None} feat=temporal+spectral+agreement  cv_accuracy=0.8591
+  [round 3] histgb  {'n': 500, 'lr': 0.05, 'l2': 1.0, 'depth': 6} feat=temporal+spectral+agreement  cv_accuracy=0.8576
+  -> new best: histgb cv_accuracy=0.8591
+  [round 4] histgb  {'n': 500, 'lr': 0.05, 'l2': 0.0, 'depth': None} feat=temporal+spectral+agreement  cv_accuracy=0.8481
+  [round 4] histgb  {'n': 500, 'lr': 0.05, 'l2': 0.0, 'depth': 6} feat=temporal+spectral+agreement  cv_accuracy=0.8545
+  [round 4] histgb  {'n': 500, 'lr': 0.05, 'l2': 1.0, 'depth': None} feat=temporal+spectral+agreement  cv_accuracy=0.8591
+  [round 4] histgb  {'n': 500, 'lr': 0.05, 'l2': 1.0, 'depth': 6} feat=temporal+spectral+agreement  cv_accuracy=0.8576
+  [round 5] histgb  {'n': 500, 'lr': 0.05, 'l2': 0.0, 'depth': None} feat=temporal+spectral+agreement  cv_accuracy=0.8481
+  [round 5] histgb  {'n': 500, 'lr': 0.05, 'l2': 0.0, 'depth': 6} feat=temporal+spectral+agreement  cv_accuracy=0.8545
+  [round 5] histgb  {'n': 500, 'lr': 0.05, 'l2': 1.0, 'depth': None} feat=temporal+spectral+agreement  cv_accuracy=0.8591
+  [round 5] histgb  {'n': 500, 'lr': 0.05, 'l2': 1.0, 'depth': 6} feat=temporal+spectral+agreement  cv_accuracy=0.8576
+  saturated (no improvement for 2 rounds); stopping
+    TEST: exact_acc=0.865  adjacent_acc=1.000  macro_f1=0.805
+    shuffle-null acc=0.313 (chance~0.349) -> OK: shuffled labels collapse toward chance
+
+  [FREQUENCY REGRESSION] subject-held-out, tremor-present only
+  [round 0] ridge   {'alpha': 1.0}                         feat=temporal                     cv_within_1hz=0.4958
+  [round 0] rf      {'n': 200}                             feat=temporal                     cv_within_1hz=0.6333
+  -> new best: rf cv_within_1hz=0.6333
+  [round 1] rf      {'n': 300}                             feat=temporal+spectral            cv_within_1hz=0.9615
+  [round 1] extra   {'n': 400}                             feat=temporal+spectral            cv_within_1hz=0.9688
+  [round 1] histgb  {'n': 300, 'lr': 0.08}                 feat=temporal+spectral            cv_within_1hz=0.9659
+  -> new best: extra cv_within_1hz=0.9688
+  TARGET REACHED: cv_within_1hz=0.9688 >= 0.95
+    TEST ML : MAE=0.182Hz  within1Hz=0.958  within0.5Hz=0.888
+    TEST FFT-only baseline (no ML): MAE=0.378Hz  within1Hz=0.868
+    -> ML uplift over plain FFT peak: +0.090 within-1Hz
+  saved -> results/decoupled_results.json
+
+================ SUMMARY ================
+{
+  "decoupled": {
+    "severity_exact": 0.865,
+    "severity_adjacent": 1.0,
+    "freq_within1hz": 0.9577205882352942,
+    "freq_mae": 0.18221325621413326,
+    "freq_naive_within1hz": 0.8676470588235294,
+    "targets_collinear": false
+  }
+}
+=== [3/4] retrain export models ===
+Generating + extracting synthetic training set...
+  extracted 400
+  extracted 800
+  extracted 1200
+  extracted 1600
+  extracted 2000
+  X=(2000, 77)
+Saved severity.joblib + frequency.joblib to C:\Users\ritayan\ClaudeHyperBone\handharness\tremor_cv\results\models
+=== [4/4] regenerate report ===
+wrote RESULTS_REPORT.md and filled IEEE_HEALTHCOM_NOTES.md
+
+SUMMARY:
+{
+ "coupled": {
+  "r": -0.9717792059741058,
+  "sevx": 0.9694444444444444,
+  "sevadj": 1.0,
+  "sevf1": 0.9633111932118673,
+  "f1hz": 0.9972222222222222,
+  "fmae": 0.14396749999999933,
+  "ffft": 0.9861111111111112,
+  "null": 0.22895833333333332,
+  "chance": 0.2851851851851852
+ },
+ "decoupled": {
+  "r": 0.2658257948072767,
+  "sevx": 0.865,
+  "sevadj": 1.0,
+  "sevf1": 0.8054842695558024,
+  "f1hz": 0.9577205882352942,
+  "fmae": 0.18221325621413326,
+  "ffft": 0.8676470588235294,
+  "null": 0.31325000000000003,
+  "chance": 0.3488888888888889
+ }
+}
+ALL_DONE

@@ -1,0 +1,221 @@
+{
+  "mode": "coupled",
+  "n_rows": 1440,
+  "n_features": 77,
+  "config": {
+    "poses": 360,
+    "frames": 120,
+    "fps": 60,
+    "subjects": 24,
+    "seed": 42,
+    "test_frac": 0.22,
+    "p_no_tremor": 0.12
+  },
+  "label_collinearity": {
+    "pearson_freq_severity": -0.9717792059741058,
+    "spearman_freq_severity": -0.9749311808099362,
+    "pearson_freq_amp": -1.0,
+    "verdict": "DEGENERATE: targets collinear (|r|>0.9) -> predicting one trivially gives the other"
+  },
+  "severity": {
+    "group_disjoint": {
+      "disjoint": true,
+      "overlap_count": 0,
+      "group_counts": [
+        18,
+        6
+      ]
+    },
+    "best": {
+      "score": 0.9675,
+      "config": [
+        "histgb",
+        {
+          "n": 300,
+          "lr": 0.08
+        }
+      ],
+      "fset": [
+        "temporal",
+        "spectral"
+      ]
+    },
+    "history": [
+      {
+        "round": 0,
+        "features": [
+          "temporal"
+        ],
+        "model": "logreg",
+        "hparams": {
+          "C": 1.0
+        },
+        "cv_score": 0.8994
+      },
+      {
+        "round": 0,
+        "features": [
+          "temporal"
+        ],
+        "model": "rf",
+        "hparams": {
+          "n": 200
+        },
+        "cv_score": 0.8844
+      },
+      {
+        "round": 1,
+        "features": [
+          "temporal",
+          "spectral"
+        ],
+        "model": "rf",
+        "hparams": {
+          "n": 300
+        },
+        "cv_score": 0.9538
+      },
+      {
+        "round": 1,
+        "features": [
+          "temporal",
+          "spectral"
+        ],
+        "model": "extra",
+        "hparams": {
+          "n": 400
+        },
+        "cv_score": 0.9413
+      },
+      {
+        "round": 1,
+        "features": [
+          "temporal",
+          "spectral"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 300,
+          "lr": 0.08
+        },
+        "cv_score": 0.9675
+      }
+    ],
+    "test_metrics": {
+      "accuracy": 0.9611111111111111,
+      "adjacent_acc": 1.0,
+      "macro_f1": 0.9507878787878787
+    },
+    "test_class_support": {
+      "Slight": 56,
+      "Mild": 60,
+      "Moderate": 100,
+      "Marked": 84,
+      "Severe": 60
+    },
+    "leakage": {
+      "label_shuffle_null": {
+        "metric": "accuracy",
+        "shuffled_score": 0.24791666666666665,
+        "majority_chance": 0.2851851851851852,
+        "verdict": "OK: shuffled labels collapse toward chance"
+      },
+      "train_test_separability": {
+        "domain_auc": 0.7241900285378546,
+        "verdict": "NOTE: train/test distributions differ (expected if subject-independent split shifts the distribution)"
+      },
+      "top_features": [
+        {
+          "feature": "peak_axis_median",
+          "importance": 0.32743055555555556
+        },
+        {
+          "feature": "disp_rms__std",
+          "importance": 0.06145833333333334
+        },
+        {
+          "feature": "tip_disp_rms__mean",
+          "importance": 0.005208333333333343
+        },
+        {
+          "feature": "peaky__mean",
+          "importance": 0.005208333333333315
+        },
+        {
+          "feature": "jerk__std",
+          "importance": 0.004513888888888887
+        },
+        {
+          "feature": "peak_iqr",
+          "importance": 0.002430555555555547
+        },
+        {
+          "feature": "jerk__max",
+          "importance": 0.002430555555555547
+        },
+        {
+          "feature": "band0__mean",
+          "importance": 0.002430555555555547
+        },
+        {
+          "feature": "peaky__std",
+          "importance": 0.0017361111111111188
+        },
+        {
+          "feature": "zcr__max",
+          "importance": 0.001736111111111105
+        }
+      ]
+    }
+  },
+  "frequency": {
+    "best": {
+      "score": 0.9981249999999999,
+      "config": [
+        "rf",
+        {
+          "n": 200
+        }
+      ],
+      "fset": [
+        "temporal"
+      ]
+    },
+    "history": [
+      {
+        "round": 0,
+        "features": [
+          "temporal"
+        ],
+        "model": "ridge",
+        "hparams": {
+          "alpha": 1.0
+        },
+        "cv_score": 0.9917
+      },
+      {
+        "round": 0,
+        "features": [
+          "temporal"
+        ],
+        "model": "rf",
+        "hparams": {
+          "n": 200
+        },
+        "cv_score": 0.9981
+      }
+    ],
+    "test_metrics": {
+      "mae_hz": 0.1441224999999988,
+      "within_1hz": 0.9916666666666667,
+      "within_0p5hz": 0.9833333333333333,
+      "r2": 0.975974675378114
+    },
+    "naive_fft_baseline": {
+      "mae_hz": 0.18270978331523197,
+      "within_1hz": 0.9277777777777778,
+      "within_0p5hz": 0.9138888888888889,
+      "r2": 0.8774347751183332
+    }
+  }
+}

@@ -1,0 +1,524 @@
+{
+  "mode": "decoupled",
+  "n_rows": 2400,
+  "n_features": 77,
+  "config": {
+    "poses": 600,
+    "frames": 240,
+    "fps": 60,
+    "subjects": 30,
+    "seed": 42,
+    "test_frac": 0.22,
+    "p_no_tremor": 0.12
+  },
+  "label_collinearity": {
+    "pearson_freq_severity": 0.23261309546592845,
+    "spearman_freq_severity": 0.16895680373496888,
+    "pearson_freq_amp": 0.07920556675001576,
+    "verdict": "OK: targets are not collinear -> two independent problems"
+  },
+  "severity": {
+    "group_disjoint": {
+      "disjoint": true,
+      "overlap_count": 0,
+      "group_counts": [
+        23,
+        7
+      ]
+    },
+    "best": {
+      "score": 0.8339583333333334,
+      "config": [
+        "histgb",
+        {
+          "n": 300,
+          "lr": 0.08
+        }
+      ],
+      "fset": [
+        "temporal",
+        "spectral"
+      ]
+    },
+    "history": [
+      {
+        "round": 0,
+        "features": [
+          "temporal"
+        ],
+        "model": "logreg",
+        "hparams": {
+          "C": 1.0
+        },
+        "cv_score": 0.789
+      },
+      {
+        "round": 0,
+        "features": [
+          "temporal"
+        ],
+        "model": "rf",
+        "hparams": {
+          "n": 200
+        },
+        "cv_score": 0.802
+      },
+      {
+        "round": 1,
+        "features": [
+          "temporal",
+          "spectral"
+        ],
+        "model": "rf",
+        "hparams": {
+          "n": 300
+        },
+        "cv_score": 0.8166
+      },
+      {
+        "round": 1,
+        "features": [
+          "temporal",
+          "spectral"
+        ],
+        "model": "extra",
+        "hparams": {
+          "n": 400
+        },
+        "cv_score": 0.7988
+      },
+      {
+        "round": 1,
+        "features": [
+          "temporal",
+          "spectral"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 300,
+          "lr": 0.08
+        },
+        "cv_score": 0.834
+      },
+      {
+        "round": 2,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 400,
+          "lr": 0.06,
+          "l2": 0.0
+        },
+        "cv_score": 0.8316
+      },
+      {
+        "round": 2,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "extra",
+        "hparams": {
+          "n": 600,
+          "leaf": 1
+        },
+        "cv_score": 0.8009
+      },
+      {
+        "round": 2,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "rf",
+        "hparams": {
+          "n": 500,
+          "leaf": 1
+        },
+        "cv_score": 0.8137
+      },
+      {
+        "round": 3,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 0.0,
+          "depth": null
+        },
+        "cv_score": 0.8336
+      },
+      {
+        "round": 3,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 0.0,
+          "depth": 6
+        },
+        "cv_score": 0.8275
+      },
+      {
+        "round": 3,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 1.0,
+          "depth": null
+        },
+        "cv_score": 0.8268
+      },
+      {
+        "round": 3,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 500,
+          "lr": 0.05,
+          "l2": 1.0,
+          "depth": 6
+        },
+        "cv_score": 0.8243
+      }
+    ],
+    "test_metrics": {
+      "accuracy": 0.9053571428571429,
+      "adjacent_acc": 1.0,
+      "macro_f1": 0.7997562063826348
+    },
+    "test_class_support": {
+      "Absent": 52,
+      "Slight": 252,
+      "Mild": 140,
+      "Moderate": 76,
+      "Marked": 12,
+      "Severe": 28
+    },
+    "leakage": {
+      "label_shuffle_null": {
+        "metric": "accuracy",
+        "shuffled_score": 0.368125,
+        "majority_chance": 0.391304347826087,
+        "verdict": "OK: shuffled labels collapse toward chance"
+      },
+      "train_test_separability": {
+        "domain_auc": 0.7354999520659572,
+        "verdict": "NOTE: train/test distributions differ (expected if subject-independent split shifts the distribution)"
+      },
+      "top_features": [
+        {
+          "feature": "disp_rms__std",
+          "importance": 0.4796875
+        },
+        {
+          "feature": "peaky__std",
+          "importance": 0.05982142857142857
+        },
+        {
+          "feature": "peakx__std",
+          "importance": 0.048883928571428606
+        },
+        {
+          "feature": "tip_ang_amp__mean",
+          "importance": 0.040178571428571425
+        },
+        {
+          "feature": "disp_rms__mean",
+          "importance": 0.01227678571428567
+        },
+        {
+          "feature": "ang_amp_median",
+          "importance": 0.010491071428571391
+        },
+        {
+          "feature": "ang_amp_p90",
+          "importance": 0.008258928571428556
+        },
+        {
+          "feature": "jerk__std",
+          "importance": 0.0071428571428571175
+        },
+        {
+          "feature": "acf_freq__mean",
+          "importance": 0.006026785714285693
+        },
+        {
+          "feature": "tip_jerk__mean",
+          "importance": 0.005803571428571408
+        }
+      ]
+    }
+  },
+  "frequency": {
+    "best": {
+      "score": 0.9037295251917894,
+      "config": [
+        "extra",
+        {
+          "n": 600,
+          "leaf": 1
+        }
+      ],
+      "fset": [
+        "temporal",
+        "spectral",
+        "agreement"
+      ]
+    },
+    "history": [
+      {
+        "round": 0,
+        "features": [
+          "temporal"
+        ],
+        "model": "ridge",
+        "hparams": {
+          "alpha": 1.0
+        },
+        "cv_score": 0.4415
+      },
+      {
+        "round": 0,
+        "features": [
+          "temporal"
+        ],
+        "model": "rf",
+        "hparams": {
+          "n": 200
+        },
+        "cv_score": 0.5724
+      },
+      {
+        "round": 1,
+        "features": [
+          "temporal",
+          "spectral"
+        ],
+        "model": "rf",
+        "hparams": {
+          "n": 300
+        },
+        "cv_score": 0.8931
+      },
+      {
+        "round": 1,
+        "features": [
+          "temporal",
+          "spectral"
+        ],
+        "model": "extra",
+        "hparams": {
+          "n": 400
+        },
+        "cv_score": 0.9031
+      },
+      {
+        "round": 1,
+        "features": [
+          "temporal",
+          "spectral"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 300,
+          "lr": 0.08
+        },
+        "cv_score": 0.898
+      },
+      {
+        "round": 2,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "histgb",
+        "hparams": {
+          "n": 400,
+          "lr": 0.06,
+          "l2": 0.0
+        },
+        "cv_score": 0.8975
+      },
+      {
+        "round": 2,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "extra",
+        "hparams": {
+          "n": 600,
+          "leaf": 1
+        },
+        "cv_score": 0.9037
+      },
+      {
+        "round": 2,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "rf",
+        "hparams": {
+          "n": 500,
+          "leaf": 1
+        },
+        "cv_score": 0.8944
+      },
+      {
+        "round": 3,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "extra",
+        "hparams": {
+          "n": 600,
+          "leaf": 1
+        },
+        "cv_score": 0.9037
+      },
+      {
+        "round": 3,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "extra",
+        "hparams": {
+          "n": 600,
+          "leaf": 2
+        },
+        "cv_score": 0.9021
+      },
+      {
+        "round": 3,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "extra",
+        "hparams": {
+          "n": 900,
+          "leaf": 1
+        },
+        "cv_score": 0.9026
+      },
+      {
+        "round": 3,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "extra",
+        "hparams": {
+          "n": 900,
+          "leaf": 2
+        },
+        "cv_score": 0.9026
+      },
+      {
+        "round": 4,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "extra",
+        "hparams": {
+          "n": 600,
+          "leaf": 1
+        },
+        "cv_score": 0.9037
+      },
+      {
+        "round": 4,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "extra",
+        "hparams": {
+          "n": 600,
+          "leaf": 2
+        },
+        "cv_score": 0.9021
+      },
+      {
+        "round": 4,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "extra",
+        "hparams": {
+          "n": 900,
+          "leaf": 1
+        },
+        "cv_score": 0.9026
+      },
+      {
+        "round": 4,
+        "features": [
+          "temporal",
+          "spectral",
+          "agreement"
+        ],
+        "model": "extra",
+        "hparams": {
+          "n": 900,
+          "leaf": 2
+        },
+        "cv_score": 0.9026
+      }
+    ],
+    "test_metrics": {
+      "mae_hz": 0.26673678894434205,
+      "within_1hz": 0.9153543307086615,
+      "within_0p5hz": 0.8405511811023622,
+      "r2": 0.9252308400993051
+    },
+    "naive_fft_baseline": {
+      "mae_hz": 0.288593118392291,
+      "within_1hz": 0.8877952755905512,
+      "within_0p5hz": 0.8267716535433071,
+      "r2": 0.8894857199704826
+    }
+  }
+}
